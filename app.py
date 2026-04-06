@@ -1,239 +1,181 @@
 # ===============================
-# app.py (ULTIMATE FINAL VERSION - PRO MAX UI + AI FEATURES)
+# app.py (FINAL FIXED WHITE UI + EXTRA FEATURES)
 # ===============================
 
 import streamlit as st
 import pandas as pd
-import numpy as np
 from PyPDF2 import PdfReader
-import re
 
 # ---------------- PAGE CONFIG ----------------
 st.set_page_config(page_title="Car Lease AI Assistant", layout="wide")
 
-# ---------------- CUSTOM CSS (HIGH VISIBILITY UI) ----------------
+# ---------------- FORCE WHITE THEME ----------------
 st.markdown("""
 <style>
-body, .main {
-    background-color: white;
+html, body, [class*="css"]  {
+    background-color: white !important;
+    color: black !important;
 }
 
 h1, h2, h3 {
-    color: #0b3c5d;
-    font-weight: 800;
+    color: #003366 !important;
+    font-weight: bold;
 }
 
-p, label, div {
-    color: #000000 !important;
-    font-size: 17px;
+p, label, div, span {
+    color: black !important;
+    font-size: 17px !important;
+}
+
+.stTextInput input {
+    background-color: #f5f5f5 !important;
+    color: black !important;
 }
 
 .stButton>button {
-    background: linear-gradient(90deg, #007acc, #005f99);
-    color: white;
+    background-color: #007acc !important;
+    color: white !important;
     border-radius: 10px;
     height: 3em;
     font-size: 16px;
 }
 
 section[data-testid="stSidebar"] {
-    background-color: #f0f2f6;
-}
-
-.stTextInput>div>div>input {
-    font-size: 16px;
+    background-color: #f2f2f2 !important;
 }
 
 </style>
 """, unsafe_allow_html=True)
 
-# ---------------- HELPER FUNCTIONS ----------------
+# ---------------- FUNCTIONS ----------------
 
-def extract_text_from_pdf(file):
-    reader = PdfReader(file)
-    text = ""
-    for page in reader.pages:
-        text += page.extract_text() or ""
-    return text
+def extract_text(file):
+    if file.type == "application/pdf":
+        reader = PdfReader(file)
+        text = ""
+        for page in reader.pages:
+            text += page.extract_text() or ""
+        return text
+    else:
+        return file.read().decode("utf-8")
 
 
-def analyze_contract(text):
+def analyze(text):
     risks = []
 
-    patterns = {
-        "High Interest Clause": ["interest", "apr", "rate"],
-        "Penalty Clause": ["penalty", "fine", "charge"],
-        "Hidden Fees": ["processing fee", "hidden", "extra charge"],
-        "Termination Risk": ["termination", "cancel", "closure"],
-        "Insurance Add-ons": ["insurance", "coverage"],
-        "Late Payment Risk": ["late payment", "delay fee"]
-    }
-
-    for risk, keywords in patterns.items():
-        for word in keywords:
-            if word in text.lower():
-                risks.append(risk)
-                break
+    if "interest" in text.lower():
+        risks.append("High Interest Rate")
+    if "penalty" in text.lower():
+        risks.append("Penalty Charges")
+    if "fee" in text.lower():
+        risks.append("Hidden Fees")
+    if "termination" in text.lower():
+        risks.append("Termination Clause")
 
     if not risks:
-        risks.append("No major risks detected ✅")
+        risks.append("No major risks found ✅")
 
     return risks
 
-
-def risk_score(risks):
-    return min(len(risks) * 20, 100)
-
-
-def generate_summary(text):
-    return text[:700] + "..." if len(text) > 700 else text
-
-
-def chatbot_response(query):
-    query = query.lower()
-
-    if "interest" in query:
-        return "Negotiate a lower APR and compare with other lenders before signing."
-    elif "penalty" in query:
-        return "Request removal or reduction of penalty clauses."
-    elif "fees" in query:
-        return "Ask for a full fee breakdown and eliminate unnecessary charges."
-    elif "insurance" in query:
-        return "Check if insurance add-ons are optional and remove if not needed."
-    else:
-        return "Focus on reducing interest, removing hidden fees, and flexible terms."
-
-# ---------------- LOGIN SYSTEM ----------------
+# ---------------- LOGIN ----------------
 def login():
-    st.title("🔐 Secure Login")
+    st.title("🔐 Login Page")
 
-    col1, col2, col3 = st.columns([1,2,1])
-    with col2:
-        user = st.text_input("👤 Username")
-        pwd = st.text_input("🔑 Password", type="password")
+    st.markdown("---")
 
-        if st.button("Login"):
-            if user == "admin" and pwd == "1234":
-                st.session_state.logged_in = True
-                st.success("Login Successful ✅")
-            else:
-                st.error("Invalid Credentials ❌")
+    username = st.text_input("👤 Username")
+    password = st.text_input("🔑 Password", type="password")
+
+    if st.button("Login"):
+        if username == "admin" and password == "1234":
+            st.session_state.logged_in = True
+            st.success("Login Successful ✅")
+        else:
+            st.error("Invalid Credentials ❌")
 
 # ---------------- MAIN APP ----------------
-def main_app():
-    st.sidebar.title("🚗 Car Lease AI Pro")
+def main():
 
-    if st.sidebar.button("🚪 Logout"):
-        st.session_state.logged_in = False
+    st.sidebar.title("🚗 Car Lease AI Assistant")
 
-    menu = st.sidebar.radio("Navigation", [
-        "📊 Dashboard",
-        "📄 Upload & Analyze",
+    menu = st.sidebar.selectbox("Select Option", [
+        "🏠 Home",
+        "📄 Upload Contract",
         "⚠️ Risk Analysis",
-        "💬 AI Chat",
-        "📈 Analytics",
-        "📑 Report Download",
-        "ℹ️ About"
+        "💬 Chatbot",
+        "📊 Dashboard",
+        "📥 Download Report"
     ])
 
-    # ---------- DASHBOARD ----------
-    if menu == "📊 Dashboard":
-        st.title("📊 Executive Dashboard")
+    # HOME
+    if menu == "🏠 Home":
+        st.title("🚗 Car Lease AI Assistant")
+        st.write("AI tool to analyze lease/loan contracts.")
 
-        col1, col2, col3 = st.columns(3)
-        col1.metric("Contracts", "25")
-        col2.metric("Risks Found", "12")
-        col3.metric("Savings Potential", "₹75,000")
-
-        st.info("💡 Upload a contract to get started with AI analysis.")
-
-    # ---------- UPLOAD ----------
-    elif menu == "📄 Upload & Analyze":
+    # UPLOAD
+    elif menu == "📄 Upload Contract":
         st.title("📄 Upload Contract")
-
-        file = st.file_uploader("Upload PDF or TXT file", type=["pdf", "txt"])
+        file = st.file_uploader("Upload PDF or TXT", type=["pdf", "txt"])
 
         if file:
-            if file.type == "application/pdf":
-                text = extract_text_from_pdf(file)
-            else:
-                text = file.read().decode("utf-8")
+            text = extract_text(file)
+            st.session_state.text = text
+            st.success("File uploaded successfully ✅")
 
-            st.session_state.contract_text = text
+            st.subheader("Summary")
+            st.write(text[:500])
 
-            st.success("✅ Contract processed successfully")
-
-            st.subheader("📑 AI Summary")
-            st.write(generate_summary(text))
-
-    # ---------- RISK ----------
+    # RISK
     elif menu == "⚠️ Risk Analysis":
-        st.title("⚠️ Smart Risk Detection")
+        st.title("⚠️ Risk Analysis")
 
-        if "contract_text" in st.session_state:
-            risks = analyze_contract(st.session_state.contract_text)
-            score = risk_score(risks)
+        if "text" in st.session_state:
+            risks = analyze(st.session_state.text)
 
             for r in risks:
-                st.warning(f"⚠️ {r}")
-
-            st.subheader("📊 Risk Score")
-            st.progress(score)
-            st.write(f"Risk Level: {score}%")
+                st.warning(r)
         else:
             st.info("Upload contract first")
 
-    # ---------- CHAT ----------
-    elif menu == "💬 AI Chat":
-        st.title("💬 Negotiation AI Assistant")
+    # CHATBOT
+    elif menu == "💬 Chatbot":
+        st.title("💬 AI Chatbot")
 
-        query = st.text_input("Ask anything about your contract...")
+        q = st.text_input("Ask question")
 
-        if query:
-            response = chatbot_response(query)
-            st.success(response)
+        if q:
+            st.success("Try negotiating interest rate and removing hidden charges.")
 
-    # ---------- ANALYTICS ----------
-    elif menu == "📈 Analytics":
-        st.title("📈 Insights Dashboard")
+    # DASHBOARD
+    elif menu == "📊 Dashboard":
+        st.title("📊 Dashboard")
 
-        data = pd.DataFrame({
-            "Category": ["Interest", "Penalty", "Fees", "Termination", "Insurance"],
-            "Count": [5, 4, 6, 3, 2]
-        })
+        col1, col2, col3 = st.columns(3)
+        col1.metric("Contracts", "10")
+        col2.metric("Risks", "4")
+        col3.metric("Savings", "₹20,000")
 
-        st.bar_chart(data.set_index("Category"))
+    # DOWNLOAD
+    elif menu == "📥 Download Report":
+        st.title("📥 Download")
 
-    # ---------- REPORT ----------
-    elif menu == "📑 Report Download":
-        st.title("📑 Download Report")
-
-        if "contract_text" in st.session_state:
-            report = generate_summary(st.session_state.contract_text)
-            st.download_button("📥 Download Summary", report, file_name="report.txt")
+        if "text" in st.session_state:
+            st.download_button("Download Report", st.session_state.text)
         else:
-            st.info("Upload contract first")
+            st.info("Upload file first")
 
-    # ---------- ABOUT ----------
-    elif menu == "ℹ️ About":
-        st.title("ℹ️ About Project")
-        st.write("AI-powered system for analyzing car lease and loan contracts.")
-        st.write("Includes risk detection, smart insights, and negotiation support.")
-
-# ---------------- APP CONTROL ----------------
+# ---------------- RUN ----------------
 if "logged_in" not in st.session_state:
     st.session_state.logged_in = False
 
-if not st.session_state.logged_in:
-    login()
+if st.session_state.logged_in:
+    main()
 else:
-    main_app()
+    login()
 
 # ===============================
 # requirements.txt
 # ===============================
 # streamlit
 # pandas
-# numpy
 # PyPDF2
-
