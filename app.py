@@ -32,6 +32,28 @@ h1, h2, h3 {
 /* Sidebar fix */
 section[data-testid="stSidebar"] {
     background-color: #f0f2f6 !important;
+    color: black !important;
+}
+
+/* Fix dropdown/selectbox text visibility */
+.stSelectbox div[data-baseweb="select"] {
+    background-color: white !important;
+    color: black !important;
+}
+
+.stSelectbox div[data-baseweb="select"] * {
+    color: black !important;
+}
+
+/* Fix uploaded file box */
+div[data-testid="stFileUploader"] {
+    background-color: #ffffff !important;
+    color: black !important;
+}
+
+/* Fix success box */
+.stAlert {
+    color: black !important;
 }
 
 /* Inputs */
