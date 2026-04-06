@@ -1,5 +1,5 @@
 # ===============================
-# app.py (FINAL FIXED WHITE UI + EXTRA FEATURES)
+# app.py (FINAL FIX - TEXT VISIBILITY 100%)
 # ===============================
 
 import streamlit as st
@@ -9,39 +9,43 @@ from PyPDF2 import PdfReader
 # ---------------- PAGE CONFIG ----------------
 st.set_page_config(page_title="Car Lease AI Assistant", layout="wide")
 
-# ---------------- FORCE WHITE THEME ----------------
+# ---------------- FORCE FULL LIGHT MODE ----------------
 st.markdown("""
 <style>
-html, body, [class*="css"]  {
+
+/* Force entire app white */
+html, body, .stApp {
     background-color: white !important;
+}
+
+/* Fix ALL text visibility */
+* {
     color: black !important;
 }
 
+/* Headings */
 h1, h2, h3 {
     color: #003366 !important;
-    font-weight: bold;
+    font-weight: bold !important;
 }
 
-p, label, div, span {
+/* Sidebar fix */
+section[data-testid="stSidebar"] {
+    background-color: #f0f2f6 !important;
+}
+
+/* Inputs */
+input, textarea {
+    background-color: #ffffff !important;
     color: black !important;
-    font-size: 17px !important;
 }
 
-.stTextInput input {
-    background-color: #f5f5f5 !important;
-    color: black !important;
-}
-
+/* Buttons */
 .stButton>button {
     background-color: #007acc !important;
     color: white !important;
-    border-radius: 10px;
-    height: 3em;
+    border-radius: 8px;
     font-size: 16px;
-}
-
-section[data-testid="stSidebar"] {
-    background-color: #f2f2f2 !important;
 }
 
 </style>
@@ -81,10 +85,8 @@ def analyze(text):
 def login():
     st.title("🔐 Login Page")
 
-    st.markdown("---")
-
-    username = st.text_input("👤 Username")
-    password = st.text_input("🔑 Password", type="password")
+    username = st.text_input("Username")
+    password = st.text_input("Password", type="password")
 
     if st.button("Login"):
         if username == "admin" and password == "1234":
@@ -93,76 +95,63 @@ def login():
         else:
             st.error("Invalid Credentials ❌")
 
-# ---------------- MAIN APP ----------------
+# ---------------- MAIN ----------------
 def main():
 
     st.sidebar.title("🚗 Car Lease AI Assistant")
 
     menu = st.sidebar.selectbox("Select Option", [
-        "🏠 Home",
-        "📄 Upload Contract",
-        "⚠️ Risk Analysis",
-        "💬 Chatbot",
-        "📊 Dashboard",
-        "📥 Download Report"
+        "Home",
+        "Upload",
+        "Risk",
+        "Chat",
+        "Dashboard",
+        "Download"
     ])
 
-    # HOME
-    if menu == "🏠 Home":
-        st.title("🚗 Car Lease AI Assistant")
+    if menu == "Home":
+        st.title("Car Lease AI Assistant")
         st.write("AI tool to analyze lease/loan contracts.")
 
-    # UPLOAD
-    elif menu == "📄 Upload Contract":
-        st.title("📄 Upload Contract")
+    elif menu == "Upload":
+        st.title("Upload Contract")
         file = st.file_uploader("Upload PDF or TXT", type=["pdf", "txt"])
 
         if file:
             text = extract_text(file)
             st.session_state.text = text
-            st.success("File uploaded successfully ✅")
-
-            st.subheader("Summary")
+            st.success("Uploaded successfully")
             st.write(text[:500])
 
-    # RISK
-    elif menu == "⚠️ Risk Analysis":
-        st.title("⚠️ Risk Analysis")
+    elif menu == "Risk":
+        st.title("Risk Analysis")
 
         if "text" in st.session_state:
             risks = analyze(st.session_state.text)
-
             for r in risks:
                 st.warning(r)
         else:
-            st.info("Upload contract first")
-
-    # CHATBOT
-    elif menu == "💬 Chatbot":
-        st.title("💬 AI Chatbot")
-
-        q = st.text_input("Ask question")
-
-        if q:
-            st.success("Try negotiating interest rate and removing hidden charges.")
-
-    # DASHBOARD
-    elif menu == "📊 Dashboard":
-        st.title("📊 Dashboard")
-
-        col1, col2, col3 = st.columns(3)
-        col1.metric("Contracts", "10")
-        col2.metric("Risks", "4")
-        col3.metric("Savings", "₹20,000")
-
-    # DOWNLOAD
-    elif menu == "📥 Download Report":
-        st.title("📥 Download")
-
-        if "text" in st.session_state:
-            st.download_button("Download Report", st.session_state.text)
-        else:
             st.info("Upload file first")
+
+    elif menu == "Chat":
+        st.title("Chatbot")
+        q = st.text_input("Ask question")
+        if q:
+            st.success("Negotiate interest and remove hidden fees.")
+
+    elif menu == "Dashboard":
+        st.title("Dashboard")
+        c1, c2, c3 = st.columns(3)
+        c1.metric("Contracts", "10")
+        c2.metric("Risks", "3")
+        c3.metric("Savings", "₹15,000")
+
+    elif menu == "Download":
+        st.title("Download Report")
+        if "text" in st.session_state:
+            st.download_button("Download", st.session_state.text)
+        else:
+            st.info("Upload first")
 
 # ---------------- RUN ----------------
 if "logged_in" not in st.session_state:
