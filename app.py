@@ -23,6 +23,31 @@ html, body, .stApp {
     color: black !important;
 }
 
+/* FIX SIDEBAR DARK TEXT ISSUE */
+section[data-testid="stSidebar"] * {
+    color: black !important;
+}
+
+/* Fix selectbox selected value */
+div[data-baseweb="select"] span {
+    color: black !important;
+}
+
+/* Fix dropdown menu items */
+ul[role="listbox"] li {
+    color: black !important;
+}
+
+/* Fix file uploader text */
+div[data-testid="stFileUploader"] span {
+    color: black !important;
+}
+
+/* Fix success/alert text */
+div[data-testid="stAlert"] * {
+    color: black !important;
+}
+
 /* Headings */
 h1, h2, h3 {
     color: #003366 !important;
