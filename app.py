@@ -1,31 +1,28 @@
-import streamlit as st
+  import streamlit as st
 import PyPDF2
 
 # ------------------ PAGE CONFIG ------------------
 st.set_page_config(page_title="Car Contract AI Assistant", layout="wide")
 
-# ------------------ GLOBAL STYLING ------------------
+# ------------------ FINAL UI FIX ------------------
 st.markdown("""
 <style>
 
-/* Main background */
-html, body, [class*="css"] {
+/* Force white theme */
+html, body, .stApp {
     background-color: #FFFFFF !important;
     color: #000000 !important;
-    font-family: 'Segoe UI', sans-serif;
 }
 
-/* Titles */
-h1 {
-    color: #1A5276;
-    font-size: 40px !important;
+/* Force ALL text visible */
+* {
+    color: #000000 !important;
 }
-h2 {
-    color: #1A5276;
-    font-size: 28px !important;
-}
-h3, h4 {
-    color: #2C3E50;
+
+/* Headings */
+h1, h2, h3 {
+    color: #1A5276 !important;
+    font-weight: bold;
 }
 
 /* Sidebar */
@@ -35,20 +32,15 @@ section[data-testid="stSidebar"] {
 
 /* Buttons */
 .stButton > button {
-    background-color: #1A5276;
-    color: white;
+    background-color: #1A5276 !important;
+    color: white !important;
     border-radius: 10px;
-    padding: 10px 18px;
+    padding: 10px 15px;
     font-size: 16px;
-    border: none;
-}
-.stButton > button:hover {
-    background-color: #154360;
-    color: white;
 }
 
 /* Inputs */
-.stTextInput input, .stSelectbox div {
+input, textarea {
     background-color: #F8F9F9 !important;
     color: black !important;
     border-radius: 8px;
@@ -56,11 +48,22 @@ section[data-testid="stSidebar"] {
 
 /* Cards */
 .card {
-    background-color: #F8F9F9;
+    background-color: #FFFFFF !important;
+    color: #000000 !important;
     padding: 20px;
     border-radius: 12px;
     box-shadow: 2px 2px 10px rgba(0,0,0,0.1);
-    margin-bottom: 20px;
+    margin-bottom: 15px;
+}
+
+/* Fix text inside cards */
+.card * {
+    color: #000000 !important;
+}
+
+/* Metric fix */
+[data-testid="stMetricValue"] {
+    color: black !important;
 }
 
 </style>
@@ -73,9 +76,9 @@ if "logged_in" not in st.session_state:
 if "history" not in st.session_state:
     st.session_state.history = []
 
-# ------------------ LOGIN PAGE ------------------
+# ------------------ LOGIN ------------------
 def login():
-    st.markdown("<h1>🔐 Login Page</h1>", unsafe_allow_html=True)
+    st.title("🔐 Login Page")
 
     username = st.text_input("Username")
     password = st.text_input("Password", type="password")
@@ -100,8 +103,6 @@ def sidebar():
         "History"
     ])
 
-    st.sidebar.markdown("---")
-
     if st.sidebar.button("Logout"):
         st.session_state.logged_in = False
         st.rerun()
@@ -110,7 +111,7 @@ def sidebar():
 
 # ------------------ DASHBOARD ------------------
 def dashboard():
-    st.markdown("<h1>📊 Dashboard</h1>", unsafe_allow_html=True)
+    st.title("📊 Dashboard")
 
     col1, col2 = st.columns(2)
 
@@ -158,7 +159,7 @@ def analyze_contract(text):
 
 # ------------------ UPLOAD PAGE ------------------
 def upload_page():
-    st.markdown("<h1>📄 Upload & Analyze Contract</h1>", unsafe_allow_html=True)
+    st.title("📄 Upload & Analyze Contract")
 
     file = st.file_uploader("Upload PDF", type=["pdf"])
 
@@ -184,7 +185,7 @@ def upload_page():
 
 # ------------------ AI ASSISTANT ------------------
 def ai_assistant():
-    st.markdown("<h1>🤖 AI Assistant</h1>", unsafe_allow_html=True)
+    st.title("🤖 AI Assistant")
 
     query = st.text_input("Ask about your contract")
 
@@ -193,7 +194,7 @@ def ai_assistant():
 
 # ------------------ NEGOTIATION ------------------
 def negotiation():
-    st.markdown("<h1>💬 Negotiation Helper</h1>", unsafe_allow_html=True)
+    st.title("💬 Negotiation Helper")
 
     issue = st.selectbox("Select Issue", [
         "High Interest Rate",
@@ -214,7 +215,7 @@ Thank you.
 
 # ------------------ HISTORY ------------------
 def history():
-    st.markdown("<h1>📁 History</h1>", unsafe_allow_html=True)
+    st.title("📁 History")
 
     if not st.session_state.history:
         st.info("No contracts analyzed yet.")
